@@ -48,18 +48,21 @@ class AppData {
       materiaId: 'materia_2',
       fecha: DateTime(2026, 10, 15),
       horario: '18:00 hs',
+      activa: true,
     ),
     MesaExamen(
       id: 'mesa_2',
       materiaId: 'materia_3',
       fecha: DateTime(2026, 10, 18),
       horario: '19:00 hs',
+      activa: true,
     ),
     MesaExamen(
       id: 'mesa_3',
       materiaId: 'materia_5',
       fecha: DateTime(2026, 10, 22),
       horario: '18:00 hs',
+      activa: true,
     ),
   ];
 
