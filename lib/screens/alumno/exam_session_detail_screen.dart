@@ -1,24 +1,25 @@
 import 'package:flutter/material.dart';
 
+import '../../data/app_data.dart';
+import '../../models/inscripcion.dart';
+import '../../models/materia.dart';
+import '../../models/mesa_examen.dart';
+
 class ExamSessionDetailScreen extends StatefulWidget {
-  final String subject;
-  final String date;
-  final String time;
-  final String status;
+  final MesaExamen mesa;
+  final Materia materia;
 
   final String? initialCondition;
   final bool initialEnrolled;
 
   // Se ejecuta inmediatamente cuando se confirma la inscripción.
-  final void Function(Map<String, String> enrollment)?
+  final void Function(Inscripcion enrollment)?
       onEnrollmentConfirmed;
 
   const ExamSessionDetailScreen({
     super.key,
-    required this.subject,
-    required this.date,
-    required this.time,
-    required this.status,
+    required this.mesa,
+    required this.materia,
     this.initialCondition,
     this.initialEnrolled = false,
     this.onEnrollmentConfirmed,
@@ -34,7 +35,15 @@ class _ExamSessionDetailScreenState
   late String? _condition;
   late bool _isEnrolled;
 
-  Map<String, String>? _newEnrollment;
+  Inscripcion? _newEnrollment;
+
+  String get _formattedDate {
+    const months = [
+      'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
+      'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre',
+    ];
+    return '${widget.mesa.fecha.day} de ${months[widget.mesa.fecha.month - 1]}';
+  }
 
   @override
   void initState() {
@@ -207,7 +216,7 @@ class _ExamSessionDetailScreenState
                   _ConfirmationData(
                     icon: Icons.menu_book_outlined,
                     label: 'Materia',
-                    value: widget.subject,
+                    value: widget.materia.nombre,
                   ),
 
                   const SizedBox(height: 10),
@@ -215,7 +224,7 @@ class _ExamSessionDetailScreenState
                   _ConfirmationData(
                     icon: Icons.calendar_today_outlined,
                     label: 'Fecha',
-                    value: widget.date,
+                    value: _formattedDate,
                   ),
 
                   const SizedBox(height: 10),
@@ -223,7 +232,7 @@ class _ExamSessionDetailScreenState
                   _ConfirmationData(
                     icon: Icons.access_time_outlined,
                     label: 'Horario',
-                    value: widget.time,
+                    value: widget.mesa.horario,
                   ),
 
                   const SizedBox(height: 10),
@@ -336,13 +345,13 @@ class _ExamSessionDetailScreenState
                     Expanded(
                       child: ElevatedButton(
                         onPressed: () {
-                          final enrollment = {
-                            'materia': widget.subject,
-                            'fecha': widget.date,
-                            'hora': widget.time,
-                            'condicion': _condition!,
-                            'estado': 'Inscripto',
-                          };
+                          final enrollment = Inscripcion(
+                            id: 'inscripcion_${DateTime.now().microsecondsSinceEpoch}',
+                            usuarioId: AppData.usuarios.first.id,
+                            mesaExamenId: widget.mesa.id,
+                            fechaInscripcion: DateTime.now(),
+                            condicion: _condition!,
+                          );
 
                           // Guardamos inmediatamente la inscripción
                           // en HomeScreen.
@@ -433,7 +442,7 @@ class _ExamSessionDetailScreenState
                   const SizedBox(width: 15),
                   Expanded(
                     child: Text(
-                      widget.subject,
+                      widget.materia.nombre,
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 21,
@@ -472,21 +481,19 @@ class _ExamSessionDetailScreenState
                   _DetailItem(
                     icon: Icons.calendar_today_outlined,
                     label: 'Fecha',
-                    value: widget.date,
+                    value: _formattedDate,
                   ),
                   const SizedBox(height: 12),
                   _DetailItem(
                     icon: Icons.access_time_outlined,
                     label: 'Horario',
-                    value: widget.time,
+                    value: widget.mesa.horario,
                   ),
                   const SizedBox(height: 12),
                   _DetailItem(
                     icon: Icons.event_available_outlined,
                     label: 'Estado',
-                    value: _isEnrolled
-                        ? 'Inscripto'
-                        : widget.status,
+                    value: _isEnrolled ? 'Inscripto' : 'Disponible',
                   ),
                 ],
               ),
@@ -582,7 +589,7 @@ class _ExamSessionDetailScreenState
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton.icon(
-                  onPressed: widget.status == 'Disponible'
+                  onPressed: !_isEnrolled
                       ? _showConditionDialog
                       : null,
                   icon: const Icon(

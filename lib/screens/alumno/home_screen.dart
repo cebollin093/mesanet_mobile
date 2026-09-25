@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 
+import '../../data/app_data.dart';
+import '../../models/inscripcion.dart';
+import '../../models/materia.dart';
+import '../../models/mesa_examen.dart';
 import 'exam_session_detail_screen.dart';
 import 'inicio_screen.dart';
 import 'mesas_screen.dart';
@@ -14,7 +18,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final List<Map<String, String>> _enrollments = [];
+  final List<Inscripcion> _enrollments = AppData.inscripciones;
 
   int _currentIndex = 0;
 
@@ -26,27 +30,23 @@ class _HomeScreenState extends State<HomeScreen> {
   ];
 
   Future<void> _openExamDetail({
-    required String subject,
-    required String date,
-    required String time,
-    required String status,
+    required MesaExamen mesa,
+    required Materia materia,
   }) async {
     final existingEnrollment = _enrollments.where(
-      (enrollment) => enrollment['materia'] == subject,
+      (enrollment) => enrollment.mesaExamenId == mesa.id,
     );
 
-    final Map<String, String>? enrollment =
+    final Inscripcion? enrollment =
         existingEnrollment.isNotEmpty ? existingEnrollment.first : null;
 
-    final result = await Navigator.push<Map<String, String>>(
+    final result = await Navigator.push<Inscripcion>(
       context,
       MaterialPageRoute(
         builder: (context) => ExamSessionDetailScreen(
-          subject: subject,
-          date: date,
-          time: time,
-          status: status,
-          initialCondition: enrollment?['condicion'],
+          mesa: mesa,
+          materia: materia,
+          initialCondition: enrollment?.condicion,
           initialEnrolled: enrollment != null,
 
           // La inscripción se guarda inmediatamente
@@ -54,7 +54,7 @@ class _HomeScreenState extends State<HomeScreen> {
           onEnrollmentConfirmed: (newEnrollment) {
             setState(() {
               _enrollments.removeWhere(
-                (enrollment) => enrollment['materia'] == subject,
+                (enrollment) => enrollment.mesaExamenId == mesa.id,
               );
               _enrollments.add(newEnrollment);
             });
@@ -68,17 +68,17 @@ class _HomeScreenState extends State<HomeScreen> {
     if (result != null) {
       setState(() {
         _enrollments.removeWhere(
-          (enrollment) => enrollment['materia'] == subject,
+          (enrollment) => enrollment.mesaExamenId == mesa.id,
         );
         _enrollments.add(result);
       });
     }
   }
 
-  void _cancelEnrollment(String subject) {
+  void _cancelEnrollment(String mesaExamenId) {
     setState(() {
       _enrollments.removeWhere(
-        (enrollment) => enrollment['materia'] == subject,
+        (enrollment) => enrollment.mesaExamenId == mesaExamenId,
       );
     });
 

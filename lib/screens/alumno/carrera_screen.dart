@@ -1,37 +1,39 @@
 import 'package:flutter/material.dart';
 
+import '../../data/app_data.dart';
+import '../../models/historial_academico.dart';
 import 'alumno_widgets.dart';
 
 class CarreraScreen extends StatelessWidget {
   const CarreraScreen();
 
+  String _formatGrade(HistorialAcademico historial) {
+    return historial.nota % 1 == 0
+        ? historial.nota.toInt().toString()
+        : historial.nota.toString();
+  }
+
   @override
   Widget build(BuildContext context) {
-    const materiasAprobadas = [
-      {
-        'nombre': 'Programación I',
-        'nota': '8',
-      },
-      {
-        'nombre': 'Base de Datos',
-        'nota': '7',
-      },
-      {
-        'nombre': 'Ingeniería de Software I',
-        'nota': '9',
-      },
-      {
-        'nombre': 'Fundamentos de Sistemas',
-        'nota': '8',
-      },
-    ];
-
-    const materiasPendientes = [
-      'Programación II',
-      'Ingeniería de Software II',
-      'Desarrollo de Aplicaciones Móviles',
-      'Proyecto Final',
-    ];
+    final usuario = AppData.usuarios.first;
+    final carrera = AppData.carreras.firstWhere(
+      (carrera) => carrera.id == usuario.carreraId,
+    );
+    final historial = AppData.historialAcademico
+        .where((registro) => registro.usuarioId == usuario.id)
+        .where((registro) => registro.aprobada)
+        .toList();
+    final materiasAprobadas = historial.map((registro) {
+      final materia = AppData.materias.firstWhere(
+        (materia) => materia.id == registro.materiaId,
+      );
+      return (materia: materia, historial: registro);
+    }).toList();
+    final materiasPendientes = AppData.materias.where((materia) {
+      return !historial.any(
+        (registro) => registro.materiaId == materia.id,
+      );
+    }).toList();
 
     return Container(
       color: const Color(0xFFD0E2EF),
@@ -44,7 +46,7 @@ class CarreraScreen extends StatelessWidget {
               color: const Color(0xFF1E5A94),
               borderRadius: BorderRadius.circular(18),
             ),
-            child: const Column(
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Icon(
@@ -54,7 +56,7 @@ class CarreraScreen extends StatelessWidget {
                 ),
                 SizedBox(height: 12),
                 Text(
-                  'Técnico Superior en Análisis de Sistemas y Desarrollo de Software',
+                  carrera.nombre,
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 18,
@@ -141,9 +143,9 @@ class CarreraScreen extends StatelessWidget {
             (materia) => Padding(
               padding: const EdgeInsets.only(bottom: 10),
               child: SubjectCard(
-                name: materia['nombre']!,
+                name: materia.materia.nombre,
                 status: 'Aprobada',
-                grade: materia['nota']!,
+                grade: _formatGrade(materia.historial),
                 approved: true,
               ),
             ),
@@ -157,7 +159,7 @@ class CarreraScreen extends StatelessWidget {
             (materia) => Padding(
               padding: const EdgeInsets.only(bottom: 10),
               child: SubjectCard(
-                name: materia,
+                name: materia.nombre,
                 status: 'Pendiente',
                 grade: null,
                 approved: false,

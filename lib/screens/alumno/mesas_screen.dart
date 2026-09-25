@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
 
+import '../../data/app_data.dart';
+import '../../models/inscripcion.dart';
+import '../../models/materia.dart';
+import '../../models/mesa_examen.dart';
 import 'alumno_widgets.dart';
 
 class MesasScreen extends StatelessWidget {
-  final List<Map<String, String>> enrollments;
+  final List<Inscripcion> enrollments;
 
   final Future<void> Function({
-    required String subject,
-    required String date,
-    required String time,
-    required String status,
+    required MesaExamen mesa,
+    required Materia materia,
   }) onOpenExamDetail;
 
   const MesasScreen({
@@ -17,10 +19,22 @@ class MesasScreen extends StatelessWidget {
     required this.onOpenExamDetail,
   });
 
-  bool _isEnrolled(String subject) {
+  bool _isEnrolled(String mesaExamenId) {
     return enrollments.any(
-      (enrollment) => enrollment['materia'] == subject,
+      (enrollment) => enrollment.mesaExamenId == mesaExamenId,
     );
+  }
+
+  Materia _materiaFor(MesaExamen mesa) => AppData.materias.firstWhere(
+        (materia) => materia.id == mesa.materiaId,
+      );
+
+  String _formattedDate(DateTime date) {
+    const months = [
+      'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
+      'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre',
+    ];
+    return '${date.day} de ${months[date.month - 1]}';
   }
 
   @override
@@ -100,59 +114,28 @@ class MesasScreen extends StatelessWidget {
             title: 'Próximas mesas',
           ),
           const SizedBox(height: 10),
-          ExamSessionCard(
-            subject: 'Programación II',
-            date: '15 de octubre',
-            time: '18:00 hs',
-            status: _isEnrolled('Programación II')
-                ? 'Inscripto'
-                : 'Disponible',
-            enrolled: _isEnrolled('Programación II'),
-            onTap: () {
-              onOpenExamDetail(
-                subject: 'Programación II',
-                date: '15 de octubre',
-                time: '18:00 hs',
-                status: 'Disponible',
-              );
-            },
-          ),
-          const SizedBox(height: 12),
-          ExamSessionCard(
-            subject: 'Base de Datos',
-            date: '18 de octubre',
-            time: '19:00 hs',
-            status: _isEnrolled('Base de Datos')
-                ? 'Inscripto'
-                : 'Disponible',
-            enrolled: _isEnrolled('Base de Datos'),
-            onTap: () {
-              onOpenExamDetail(
-                subject: 'Base de Datos',
-                date: '18 de octubre',
-                time: '19:00 hs',
-                status: 'Disponible',
-              );
-            },
-          ),
-          const SizedBox(height: 12),
-          ExamSessionCard(
-            subject: 'Ingeniería de Software',
-            date: '22 de octubre',
-            time: '18:00 hs',
-            status: _isEnrolled('Ingeniería de Software')
-                ? 'Inscripto'
-                : 'Disponible',
-            enrolled: _isEnrolled('Ingeniería de Software'),
-            onTap: () {
-              onOpenExamDetail(
-                subject: 'Ingeniería de Software',
-                date: '22 de octubre',
-                time: '18:00 hs',
-                status: 'Disponible',
-              );
-            },
-          ),
+          for (var index = 0; index < AppData.mesas.length; index++) ...[
+            Builder(
+              builder: (context) {
+                final mesa = AppData.mesas[index];
+                final materia = _materiaFor(mesa);
+                final enrolled = _isEnrolled(mesa.id);
+                return ExamSessionCard(
+                  subject: materia.nombre,
+                  date: _formattedDate(mesa.fecha),
+                  time: mesa.horario,
+                  status: enrolled ? 'Inscripto' : 'Disponible',
+                  enrolled: enrolled,
+                  onTap: () => onOpenExamDetail(
+                    mesa: mesa,
+                    materia: materia,
+                  ),
+                );
+              },
+            ),
+            if (index < AppData.mesas.length - 1)
+              const SizedBox(height: 12),
+          ],
           const SizedBox(height: 20),
         ],
       ),

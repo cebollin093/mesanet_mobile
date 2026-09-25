@@ -1,16 +1,36 @@
 import 'package:flutter/material.dart';
 
+import '../../data/app_data.dart';
+import '../../models/inscripcion.dart';
+import '../../models/materia.dart';
+import '../../models/mesa_examen.dart';
 import 'alumno_widgets.dart';
 
 class InscripcionesScreen extends StatelessWidget {
-  final List<Map<String, String>> enrollments;
+  final List<Inscripcion> enrollments;
 
-  final void Function(String subject) onCancelEnrollment;
+  final void Function(String mesaExamenId) onCancelEnrollment;
 
   const InscripcionesScreen({
     required this.enrollments,
     required this.onCancelEnrollment,
   });
+
+  MesaExamen _mesaFor(Inscripcion inscripcion) => AppData.mesas.firstWhere(
+        (mesa) => mesa.id == inscripcion.mesaExamenId,
+      );
+
+  Materia _materiaFor(MesaExamen mesa) => AppData.materias.firstWhere(
+        (materia) => materia.id == mesa.materiaId,
+      );
+
+  String _formattedDate(DateTime date) {
+    const months = [
+      'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
+      'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre',
+    ];
+    return '${date.day} de ${months[date.month - 1]}';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -157,18 +177,18 @@ class InscripcionesScreen extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             ...enrollments.map(
-              (inscripcion) => InscriptionCard(
-                materia: inscripcion['materia']!,
-                fecha: inscripcion['fecha']!,
-                hora: inscripcion['hora']!,
-                condicion: inscripcion['condicion']!,
-                estado: inscripcion['estado']!,
-                onCancel: () {
-                  onCancelEnrollment(
-                    inscripcion['materia']!,
-                  );
-                },
-              ),
+              (inscripcion) {
+                final mesa = _mesaFor(inscripcion);
+                final materia = _materiaFor(mesa);
+                return InscriptionCard(
+                  materia: materia.nombre,
+                  fecha: _formattedDate(mesa.fecha),
+                  hora: mesa.horario,
+                  condicion: inscripcion.condicion,
+                  estado: 'Inscripto',
+                  onCancel: () => onCancelEnrollment(inscripcion.mesaExamenId),
+                );
+              },
             ),
           ],
         ],

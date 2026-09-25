@@ -1,18 +1,40 @@
 import 'package:flutter/material.dart';
 
+import '../../data/app_data.dart';
+import '../../models/inscripcion.dart';
+import '../../models/materia.dart';
+import '../../models/mesa_examen.dart';
 import 'alumno_widgets.dart';
 
 class InicioScreen extends StatelessWidget {
-  final List<Map<String, String>> enrollments;
+  final List<Inscripcion> enrollments;
 
   const InicioScreen({
     required this.enrollments,
   });
 
+  MesaExamen _mesaFor(Inscripcion inscripcion) => AppData.mesas.firstWhere(
+        (mesa) => mesa.id == inscripcion.mesaExamenId,
+      );
+
+  Materia _materiaFor(MesaExamen mesa) => AppData.materias.firstWhere(
+        (materia) => materia.id == mesa.materiaId,
+      );
+
+  String _formattedDate(DateTime date) {
+    const months = [
+      'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
+      'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre',
+    ];
+    return '${date.day} de ${months[date.month - 1]}';
+  }
+
   @override
   Widget build(BuildContext context) {
     final bool hasEnrollment = enrollments.isNotEmpty;
     final enrollment = hasEnrollment ? enrollments.first : null;
+    final mesa = enrollment == null ? null : _mesaFor(enrollment);
+    final materia = mesa == null ? null : _materiaFor(mesa);
 
     return Container(
       color: const Color(0xFFD0E2EF),
@@ -97,7 +119,7 @@ class InicioScreen extends StatelessWidget {
                             ),
                             const SizedBox(height: 5),
                             Text(
-                              enrollment!['materia']!,
+                              materia!.nombre,
                               style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 18,
@@ -106,7 +128,7 @@ class InicioScreen extends StatelessWidget {
                             ),
                             const SizedBox(height: 5),
                             Text(
-                              '${enrollment['fecha']} · ${enrollment['hora']}',
+                              '${_formattedDate(mesa!.fecha)} · ${mesa.horario}',
                               style: const TextStyle(
                                 color: Color(0xFFDCEAF5),
                                 fontSize: 13,
@@ -122,7 +144,7 @@ class InicioScreen extends StatelessWidget {
                                 ),
                                 const SizedBox(width: 5),
                                 Text(
-                                  'Inscripto · ${enrollment['condicion']}',
+                                  'Inscripto · ${enrollment!.condicion}',
                                   style: const TextStyle(
                                     color: Colors.white,
                                     fontSize: 12,
