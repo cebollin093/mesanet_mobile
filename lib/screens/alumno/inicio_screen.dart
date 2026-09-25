@@ -9,7 +9,7 @@ import 'alumno_widgets.dart';
 class InicioScreen extends StatelessWidget {
   final List<Inscripcion> enrollments;
 
-  const InicioScreen({
+  const InicioScreen({super.key, 
     required this.enrollments,
   });
 

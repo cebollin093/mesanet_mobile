@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class SectionTitle extends StatelessWidget {
   final String title;
 
-  const SectionTitle({
+  const SectionTitle({super.key, 
     required this.title,
   });
 
@@ -39,7 +39,7 @@ class AcademicCard extends StatelessWidget {
   final String subtitle;
   final IconData icon;
 
-  const AcademicCard({
+  const AcademicCard({super.key, 
     required this.title,
     required this.value,
     required this.subtitle,
@@ -116,7 +116,7 @@ class QuickAction extends StatelessWidget {
   final IconData icon;
   final String title;
 
-  const QuickAction({
+  const QuickAction({super.key, 
     required this.icon,
     required this.title,
   });
@@ -178,7 +178,7 @@ class FilterButton extends StatelessWidget {
   final String title;
   final bool selected;
 
-  const FilterButton({
+  const FilterButton({super.key, 
     required this.title,
     required this.selected,
   });
@@ -222,7 +222,7 @@ class ExamSessionCard extends StatelessWidget {
   final bool enrolled;
   final VoidCallback onTap;
 
-  const ExamSessionCard({
+  const ExamSessionCard({super.key, 
     required this.subject,
     required this.date,
     required this.time,
@@ -363,7 +363,7 @@ class SubjectCard extends StatelessWidget {
   final String? grade;
   final bool approved;
 
-  const SubjectCard({
+  const SubjectCard({super.key, 
     required this.name,
     required this.status,
     required this.grade,
@@ -454,7 +454,7 @@ class InscriptionCard extends StatelessWidget {
   final String estado;
   final VoidCallback onCancel;
 
-  const InscriptionCard({
+  const InscriptionCard({super.key, 
     required this.materia,
     required this.fecha,
     required this.hora,
@@ -771,7 +771,7 @@ class InfoItem extends StatelessWidget {
   final String label;
   final String value;
 
-  const InfoItem({
+  const InfoItem({super.key, 
     required this.icon,
     required this.label,
     required this.value,

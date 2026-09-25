@@ -14,7 +14,7 @@ class MesasScreen extends StatelessWidget {
     required Materia materia,
   }) onOpenExamDetail;
 
-  const MesasScreen({
+  const MesasScreen({super.key, 
     required this.enrollments,
     required this.onOpenExamDetail,
   });

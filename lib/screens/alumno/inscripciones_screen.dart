@@ -11,7 +11,7 @@ class InscripcionesScreen extends StatelessWidget {
 
   final void Function(String mesaExamenId) onCancelEnrollment;
 
-  const InscripcionesScreen({
+  const InscripcionesScreen({super.key, 
     required this.enrollments,
     required this.onCancelEnrollment,
   });

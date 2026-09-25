@@ -5,7 +5,7 @@ import '../../models/historial_academico.dart';
 import 'alumno_widgets.dart';
 
 class CarreraScreen extends StatelessWidget {
-  const CarreraScreen();
+  const CarreraScreen({super.key});
 
   String _formatGrade(HistorialAcademico historial) {
     return historial.nota % 1 == 0
