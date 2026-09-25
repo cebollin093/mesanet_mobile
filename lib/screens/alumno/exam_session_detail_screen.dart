@@ -45,6 +45,57 @@ class _ExamSessionDetailScreenState
     return '${widget.mesa.fecha.day} de ${months[widget.mesa.fecha.month - 1]}';
   }
 
+  String? _validateEnrollment() {
+    if (AppData.usuarios.isEmpty) {
+      return 'No hay un usuario disponible para realizar la inscripción.';
+    }
+
+    final mesaExists = AppData.mesas.any(
+      (mesa) => mesa.id == widget.mesa.id,
+    );
+    if (!mesaExists) {
+      return 'La mesa de examen seleccionada ya no está disponible.';
+    }
+
+    final usuario = AppData.usuarios.first;
+    final alreadyEnrolled = AppData.inscripciones.any(
+      (inscripcion) =>
+          inscripcion.usuarioId == usuario.id &&
+          inscripcion.mesaExamenId == widget.mesa.id,
+    );
+    if (alreadyEnrolled) {
+      return 'Ya estás inscripto a esta mesa de examen.';
+    }
+
+    final correlatividades = AppData.correlatividades.where(
+      (correlatividad) => correlatividad.materiaId == widget.materia.id,
+    );
+    for (final correlatividad in correlatividades) {
+      final aprobada = AppData.historialAcademico.any(
+        (historial) =>
+            historial.usuarioId == usuario.id &&
+            historial.materiaId == correlatividad.materiaCorrelativaId &&
+            historial.aprobada &&
+            historial.nota >= 4,
+      );
+      if (!aprobada) {
+        return 'No podés inscribirte porque no aprobaste la materia correlativa.';
+      }
+    }
+
+    return null;
+  }
+
+  Inscripcion _createEnrollment() {
+    return Inscripcion(
+      id: 'inscripcion_${DateTime.now().microsecondsSinceEpoch}',
+      usuarioId: AppData.usuarios.first.id,
+      mesaExamenId: widget.mesa.id,
+      fechaInscripcion: DateTime.now(),
+      condicion: _condition!,
+    );
+  }
+
   @override
   void initState() {
     super.initState();
@@ -345,13 +396,16 @@ class _ExamSessionDetailScreenState
                     Expanded(
                       child: ElevatedButton(
                         onPressed: () {
-                          final enrollment = Inscripcion(
-                            id: 'inscripcion_${DateTime.now().microsecondsSinceEpoch}',
-                            usuarioId: AppData.usuarios.first.id,
-                            mesaExamenId: widget.mesa.id,
-                            fechaInscripcion: DateTime.now(),
-                            condicion: _condition!,
-                          );
+                          final validationError = _validateEnrollment();
+                          if (validationError != null) {
+                            Navigator.pop(dialogContext);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text(validationError)),
+                            );
+                            return;
+                          }
+
+                          final enrollment = _createEnrollment();
 
                           // Guardamos inmediatamente la inscripción
                           // en HomeScreen.

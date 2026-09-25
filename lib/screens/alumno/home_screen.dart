@@ -34,7 +34,9 @@ class _HomeScreenState extends State<HomeScreen> {
     required Materia materia,
   }) async {
     final existingEnrollment = _enrollments.where(
-      (enrollment) => enrollment.mesaExamenId == mesa.id,
+      (enrollment) =>
+          enrollment.usuarioId == AppData.usuarios.first.id &&
+          enrollment.mesaExamenId == mesa.id,
     );
 
     final Inscripcion? enrollment =
@@ -54,7 +56,9 @@ class _HomeScreenState extends State<HomeScreen> {
           onEnrollmentConfirmed: (newEnrollment) {
             setState(() {
               _enrollments.removeWhere(
-                (enrollment) => enrollment.mesaExamenId == mesa.id,
+                (enrollment) =>
+                    enrollment.usuarioId == AppData.usuarios.first.id &&
+                    enrollment.mesaExamenId == mesa.id,
               );
               _enrollments.add(newEnrollment);
             });
@@ -68,7 +72,9 @@ class _HomeScreenState extends State<HomeScreen> {
     if (result != null) {
       setState(() {
         _enrollments.removeWhere(
-          (enrollment) => enrollment.mesaExamenId == mesa.id,
+          (enrollment) =>
+              enrollment.usuarioId == AppData.usuarios.first.id &&
+              enrollment.mesaExamenId == mesa.id,
         );
         _enrollments.add(result);
       });
@@ -78,7 +84,9 @@ class _HomeScreenState extends State<HomeScreen> {
   void _cancelEnrollment(String mesaExamenId) {
     setState(() {
       _enrollments.removeWhere(
-        (enrollment) => enrollment.mesaExamenId == mesaExamenId,
+        (enrollment) =>
+            enrollment.usuarioId == AppData.usuarios.first.id &&
+            enrollment.mesaExamenId == mesaExamenId,
       );
     });
 

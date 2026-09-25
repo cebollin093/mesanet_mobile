@@ -30,6 +30,9 @@ class CarreraScreen extends StatelessWidget {
       return (materia: materia, historial: registro);
     }).toList();
     final materiasPendientes = AppData.materias.where((materia) {
+      if (materia.carreraId != carrera.id) {
+        return false;
+      }
       return !historial.any(
         (registro) => registro.materiaId == materia.id,
       );
