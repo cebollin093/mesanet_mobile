@@ -16,21 +16,9 @@ class AppData {
   ];
 
   static final materias = [
-    Materia(
-      id: 'materia_1',
-      nombre: 'Programación I',
-      carreraId: 'carrera_1',
-    ),
-    Materia(
-      id: 'materia_2',
-      nombre: 'Programación II',
-      carreraId: 'carrera_1',
-    ),
-    Materia(
-      id: 'materia_3',
-      nombre: 'Base de Datos',
-      carreraId: 'carrera_1',
-    ),
+    Materia(id: 'materia_1', nombre: 'Programación I', carreraId: 'carrera_1'),
+    Materia(id: 'materia_2', nombre: 'Programación II', carreraId: 'carrera_1'),
+    Materia(id: 'materia_3', nombre: 'Base de Datos', carreraId: 'carrera_1'),
     Materia(
       id: 'materia_4',
       nombre: 'Ingeniería de Software I',
@@ -46,11 +34,7 @@ class AppData {
       nombre: 'Desarrollo de Aplicaciones Móviles',
       carreraId: 'carrera_1',
     ),
-    Materia(
-      id: 'materia_7',
-      nombre: 'Proyecto Final',
-      carreraId: 'carrera_1',
-    ),
+    Materia(id: 'materia_7', nombre: 'Proyecto Final', carreraId: 'carrera_1'),
     Materia(
       id: 'materia_8',
       nombre: 'Fundamentos de Sistemas',
@@ -85,6 +69,15 @@ class AppData {
       nombre: 'Alumno',
       email: 'alumno@mesanet.com',
       carreraId: 'carrera_1',
+      rol: 'alumno',
+    ),
+
+    Usuario(
+      id: 'admin_1',
+      nombre: 'Administrador',
+      email: 'admin@mesanet.com',
+      carreraId: 'carrera_1',
+      rol: 'administrador',
     ),
   ];
 
