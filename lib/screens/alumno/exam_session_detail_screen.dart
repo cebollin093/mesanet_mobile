@@ -4,10 +4,12 @@ import '../../data/app_data.dart';
 import '../../models/inscripcion.dart';
 import '../../models/materia.dart';
 import '../../models/mesa_examen.dart';
+import '../../models/usuario.dart';
 
 class ExamSessionDetailScreen extends StatefulWidget {
   final MesaExamen mesa;
   final Materia materia;
+  final Usuario usuario;
 
   final String? initialCondition;
   final bool initialEnrolled;
@@ -20,6 +22,7 @@ class ExamSessionDetailScreen extends StatefulWidget {
     super.key,
     required this.mesa,
     required this.materia,
+    required this.usuario,
     this.initialCondition,
     this.initialEnrolled = false,
     this.onEnrollmentConfirmed,
@@ -46,9 +49,7 @@ class _ExamSessionDetailScreenState
   }
 
   String? _validateEnrollment() {
-    if (AppData.usuarios.isEmpty) {
-      return 'No hay un usuario disponible para realizar la inscripción.';
-    }
+    final usuario = widget.usuario;
 
     final mesaExists = AppData.mesas.any(
       (mesa) => mesa.id == widget.mesa.id,
@@ -57,7 +58,6 @@ class _ExamSessionDetailScreenState
       return 'La mesa de examen seleccionada ya no está disponible.';
     }
 
-    final usuario = AppData.usuarios.first;
     final alreadyEnrolled = AppData.inscripciones.any(
       (inscripcion) =>
           inscripcion.usuarioId == usuario.id &&
@@ -89,7 +89,7 @@ class _ExamSessionDetailScreenState
   Inscripcion _createEnrollment() {
     return Inscripcion(
       id: 'inscripcion_${DateTime.now().microsecondsSinceEpoch}',
-      usuarioId: AppData.usuarios.first.id,
+      usuarioId: widget.usuario.id,
       mesaExamenId: widget.mesa.id,
       fechaInscripcion: DateTime.now(),
       condicion: _condition!,

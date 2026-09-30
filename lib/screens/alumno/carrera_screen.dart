@@ -2,10 +2,13 @@ import 'package:flutter/material.dart';
 
 import '../../data/app_data.dart';
 import '../../models/historial_academico.dart';
+import '../../models/usuario.dart';
 import 'alumno_widgets.dart';
 
 class CarreraScreen extends StatelessWidget {
-  const CarreraScreen({super.key});
+  final Usuario usuario;
+
+  const CarreraScreen({super.key, required this.usuario});
 
   String _formatGrade(HistorialAcademico historial) {
     return historial.nota % 1 == 0
@@ -15,7 +18,6 @@ class CarreraScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final usuario = AppData.usuarios.first;
     final carrera = AppData.carreras.firstWhere(
       (carrera) => carrera.id == usuario.carreraId,
     );

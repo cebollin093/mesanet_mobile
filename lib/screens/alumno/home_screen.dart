@@ -4,6 +4,7 @@ import '../../data/app_data.dart';
 import '../../models/inscripcion.dart';
 import '../../models/materia.dart';
 import '../../models/mesa_examen.dart';
+import '../../models/usuario.dart';
 import '../auth/login_screen.dart';
 import 'exam_session_detail_screen.dart';
 import 'inicio_screen.dart';
@@ -12,7 +13,9 @@ import 'carrera_screen.dart';
 import 'inscripciones_screen.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  final Usuario usuario;
+
+  const HomeScreen({super.key, required this.usuario});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -36,7 +39,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }) async {
     final existingEnrollment = _enrollments.where(
       (enrollment) =>
-          enrollment.usuarioId == AppData.usuarios.first.id &&
+          enrollment.usuarioId == widget.usuario.id &&
           enrollment.mesaExamenId == mesa.id,
     );
 
@@ -49,6 +52,7 @@ class _HomeScreenState extends State<HomeScreen> {
         builder: (context) => ExamSessionDetailScreen(
           mesa: mesa,
           materia: materia,
+          usuario: widget.usuario,
           initialCondition: enrollment?.condicion,
           initialEnrolled: enrollment != null,
 
@@ -58,7 +62,7 @@ class _HomeScreenState extends State<HomeScreen> {
             setState(() {
               _enrollments.removeWhere(
                 (enrollment) =>
-                    enrollment.usuarioId == AppData.usuarios.first.id &&
+                  enrollment.usuarioId == widget.usuario.id &&
                     enrollment.mesaExamenId == mesa.id,
               );
 
@@ -75,7 +79,7 @@ class _HomeScreenState extends State<HomeScreen> {
       setState(() {
         _enrollments.removeWhere(
           (enrollment) =>
-              enrollment.usuarioId == AppData.usuarios.first.id &&
+              enrollment.usuarioId == widget.usuario.id &&
               enrollment.mesaExamenId == mesa.id,
         );
 
@@ -88,7 +92,7 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       _enrollments.removeWhere(
         (enrollment) =>
-            enrollment.usuarioId == AppData.usuarios.first.id &&
+          enrollment.usuarioId == widget.usuario.id &&
             enrollment.mesaExamenId == mesaExamenId,
       );
     });
@@ -102,17 +106,21 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final enrollments = _enrollments
+        .where((enrollment) => enrollment.usuarioId == widget.usuario.id)
+        .toList();
+
     final List<Widget> pages = [
       InicioScreen(
-        enrollments: _enrollments,
+        enrollments: enrollments,
       ),
       MesasScreen(
-        enrollments: _enrollments,
+        enrollments: enrollments,
         onOpenExamDetail: _openExamDetail,
       ),
-      const CarreraScreen(),
+      CarreraScreen(usuario: widget.usuario),
       InscripcionesScreen(
-        enrollments: _enrollments,
+        enrollments: enrollments,
         onCancelEnrollment: _cancelEnrollment,
       ),
     ];
