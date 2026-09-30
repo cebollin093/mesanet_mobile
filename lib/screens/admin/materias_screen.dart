@@ -194,11 +194,13 @@ class _MateriasScreenState extends State<MateriasScreen> {
                         ),
                       );
                     }).toList(),
-                    onChanged: (value) {
-                      setDialogState(() {
-                        carreraId = value;
-                      });
-                    },
+                    onChanged: materia == null
+                        ? (value) {
+                            setDialogState(() {
+                              carreraId = value;
+                            });
+                          }
+                        : null,
                   ),
                 ],
               ),
@@ -267,7 +269,7 @@ class _MateriasScreenState extends State<MateriasScreen> {
                                 AppData.materias[index] = Materia(
                                   id: materia.id,
                                   nombre: nombre,
-                                  carreraId: carreraId!,
+                                  carreraId: materia.carreraId,
                                 );
                               }
                             }
