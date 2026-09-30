@@ -28,6 +28,114 @@ class _MateriasScreenState extends State<MateriasScreen> {
     return carrera.isEmpty ? 'Carrera desconocida' : carrera.first.nombre;
   }
 
+  bool _tieneReferencias(String materiaId) {
+    return AppData.mesas.any((mesa) => mesa.materiaId == materiaId) ||
+        AppData.correlatividades.any(
+          (correlatividad) =>
+              correlatividad.materiaId == materiaId ||
+              correlatividad.materiaCorrelativaId == materiaId,
+        ) ||
+        AppData.historialAcademico.any(
+          (historial) => historial.materiaId == materiaId,
+        );
+  }
+
+  Future<void> _eliminarMateria(Materia materia) async {
+    if (_tieneReferencias(materia.id)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'No se puede eliminar la materia porque tiene datos asociados.',
+          ),
+        ),
+      );
+      return;
+    }
+
+    final confirmar = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          backgroundColor: background,
+          title: const Text(
+            'Eliminar materia',
+            style: TextStyle(
+              color: darkerBlue,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          content: Text('¿Querés eliminar la materia "${materia.nombre}"?'),
+          actions: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SizedBox(
+                  width: 120,
+                  height: 44,
+                  child: OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: darkerBlue,
+                      backgroundColor: Colors.white,
+                      side: const BorderSide(
+                        color: darkerBlue,
+                        width: 1.5,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                    onPressed: () => Navigator.pop(dialogContext, false),
+                    child: const Text('Cancelar'),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                SizedBox(
+                  width: 120,
+                  height: 44,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: orange,
+                      foregroundColor: Colors.white,
+                      side: const BorderSide(
+                        color: orange,
+                        width: 1.5,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      elevation: 0,
+                    ),
+                    onPressed: () => Navigator.pop(dialogContext, true),
+                    child: const Text('Eliminar'),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirmar != true || !mounted) {
+      return;
+    }
+
+    if (_tieneReferencias(materia.id)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'No se puede eliminar la materia porque tiene datos asociados.',
+          ),
+        ),
+      );
+      return;
+    }
+
+    setState(() {
+      AppData.materias.removeWhere((m) => m.id == materia.id);
+    });
+  }
+
   void _mostrarFormulario({Materia? materia}) {
     final nombreController = TextEditingController(
       text: materia?.nombre ?? '',
@@ -514,6 +622,8 @@ class _MateriasScreenState extends State<MateriasScreen> {
                                 );
                               } else if (value == 'correlativas') {
                                 _mostrarCorrelatividades(materia);
+                              } else if (value == 'eliminar') {
+                                _eliminarMateria(materia);
                               }
                             },
                             itemBuilder: (context) => const [
@@ -526,6 +636,10 @@ class _MateriasScreenState extends State<MateriasScreen> {
                                 child: Text(
                                   'Correlatividades',
                                 ),
+                              ),
+                              PopupMenuItem(
+                                value: 'eliminar',
+                                child: Text('Eliminar'),
                               ),
                             ],
                           ),
