@@ -93,6 +93,15 @@ class _ExamSessionDetailScreenState
       return 'La mesa de examen seleccionada ya no está disponible.';
     }
 
+    final materiasActuales = AppData.materias.where(
+      (materia) => materia.id == mesaActual.materiaId,
+    );
+    if (materiasActuales.isEmpty ||
+        materiasActuales.first.carreraId != usuario.carreraId) {
+      return 'La mesa de examen seleccionada ya no está disponible.';
+    }
+    final materiaActual = materiasActuales.first;
+
     final alreadyEnrolled = AppData.inscripciones.any(
       (inscripcion) =>
           inscripcion.usuarioId == usuario.id &&
@@ -103,7 +112,7 @@ class _ExamSessionDetailScreenState
     }
 
     final correlatividades = AppData.correlatividades.where(
-      (correlatividad) => correlatividad.materiaId == widget.materia.id,
+      (correlatividad) => correlatividad.materiaId == materiaActual.id,
     );
     for (final correlatividad in correlatividades) {
       final aprobada = AppData.historialAcademico.any(

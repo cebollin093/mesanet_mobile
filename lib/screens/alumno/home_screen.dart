@@ -115,6 +115,7 @@ class _HomeScreenState extends State<HomeScreen> {
         enrollments: enrollments,
       ),
       MesasScreen(
+        usuario: widget.usuario,
         enrollments: enrollments,
         onOpenExamDetail: _openExamDetail,
       ),

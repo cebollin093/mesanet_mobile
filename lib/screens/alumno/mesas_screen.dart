@@ -4,11 +4,13 @@ import '../../data/app_data.dart';
 import '../../models/inscripcion.dart';
 import '../../models/materia.dart';
 import '../../models/mesa_examen.dart';
+import '../../models/usuario.dart';
 import 'alumno_widgets.dart';
 
 class MesasScreen extends StatelessWidget {
   static final RegExp _timeFormat = RegExp(r'^([0-9]{2}):([0-9]{2}) hs$');
 
+  final Usuario usuario;
   final List<Inscripcion> enrollments;
 
   final Future<void> Function({
@@ -17,6 +19,7 @@ class MesasScreen extends StatelessWidget {
   }) onOpenExamDetail;
 
   const MesasScreen({super.key, 
+    required this.usuario,
     required this.enrollments,
     required this.onOpenExamDetail,
   });
@@ -29,6 +32,15 @@ class MesasScreen extends StatelessWidget {
 
   bool _isAvailable(MesaExamen mesa, DateTime now) {
     if (!mesa.activa) {
+      return false;
+    }
+
+    final materiaExistsInCareer = AppData.materias.any(
+      (materia) =>
+          materia.id == mesa.materiaId &&
+          materia.carreraId == usuario.carreraId,
+    );
+    if (!materiaExistsInCareer) {
       return false;
     }
 
