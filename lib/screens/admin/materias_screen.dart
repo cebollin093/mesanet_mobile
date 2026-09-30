@@ -180,6 +180,39 @@ class _MateriasScreenState extends State<MateriasScreen> {
     );
   }
 
+  bool _hayCaminoHasta({
+    required String desdeMateriaId,
+    required String hastaMateriaId,
+    required String materiaEditadaId,
+  }) {
+    final visitadas = <String>{};
+
+    bool recorrer(String materiaId) {
+      if (materiaId == hastaMateriaId) {
+        return true;
+      }
+
+      if (!visitadas.add(materiaId)) {
+        return false;
+      }
+
+      for (final correlatividad in AppData.correlatividades) {
+        if (correlatividad.materiaId == materiaEditadaId ||
+            correlatividad.materiaId != materiaId) {
+          continue;
+        }
+
+        if (recorrer(correlatividad.materiaCorrelativaId)) {
+          return true;
+        }
+      }
+
+      return false;
+    }
+
+    return recorrer(desdeMateriaId);
+  }
+
   void _mostrarCorrelatividades(Materia materia) {
     final existentes = AppData.correlatividades
         .where((c) => c.materiaId == materia.id)
@@ -280,6 +313,25 @@ class _MateriasScreenState extends State<MateriasScreen> {
                           elevation: 0,
                         ),
                         onPressed: () {
+                          final generaCiclo = seleccionadas.any(
+                            (correlativaId) => _hayCaminoHasta(
+                              desdeMateriaId: correlativaId,
+                              hastaMateriaId: materia.id,
+                              materiaEditadaId: materia.id,
+                            ),
+                          );
+
+                          if (generaCiclo) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text(
+                                  'La selección genera una correlatividad circular.',
+                                ),
+                              ),
+                            );
+                            return;
+                          }
+
                           setState(() {
                             AppData.correlatividades.removeWhere(
                               (c) => c.materiaId == materia.id,
