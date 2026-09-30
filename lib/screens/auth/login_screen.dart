@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../data/app_data.dart';
+import '../admin/admin_home_screen.dart';
 import '../alumno/home_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -29,11 +31,38 @@ class _LoginScreenState extends State<LoginScreen> {
       return;
     }
 
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(
-        builder: (_) => const HomeScreen(),
-      ),
+    final email = _emailController.text.trim().toLowerCase();
+
+    final usuario = AppData.usuarios.where(
+      (usuario) => usuario.email.toLowerCase() == email,
     );
+
+    if (usuario.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'No existe un usuario registrado con ese correo.',
+          ),
+        ),
+      );
+      return;
+    }
+
+    final usuarioActual = usuario.first;
+
+    if (usuarioActual.rol == 'administrador') {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (_) => const AdminHomeScreen(),
+        ),
+      );
+    } else {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (_) => const HomeScreen(),
+        ),
+      );
+    }
   }
 
   @override
@@ -60,9 +89,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       size: 70,
                       color: Colors.white,
                     ),
-
                     const SizedBox(height: 12),
-
                     const Text(
                       'MesaNet',
                       style: TextStyle(
@@ -72,9 +99,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         letterSpacing: 0.5,
                       ),
                     ),
-
                     const SizedBox(height: 6),
-
                     Text(
                       'Gestión académica',
                       style: TextStyle(
@@ -82,9 +107,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         fontSize: 15,
                       ),
                     ),
-
                     const SizedBox(height: 30),
-
                     Container(
                       padding: const EdgeInsets.all(26),
                       decoration: BoxDecoration(
@@ -111,9 +134,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-
                             const SizedBox(height: 6),
-
                             Text(
                               'Ingresá para acceder a tu información académica.',
                               style: TextStyle(
@@ -121,9 +142,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 fontSize: 14,
                               ),
                             ),
-
                             const SizedBox(height: 24),
-
                             TextFormField(
                               controller: _emailController,
                               keyboardType: TextInputType.emailAddress,
@@ -146,9 +165,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 return null;
                               },
                             ),
-
                             const SizedBox(height: 16),
-
                             TextFormField(
                               controller: _passwordController,
                               obscureText: _obscurePassword,
@@ -183,9 +200,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 return null;
                               },
                             ),
-
                             const SizedBox(height: 8),
-
                             Align(
                               alignment: Alignment.centerRight,
                               child: TextButton(
@@ -204,9 +219,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 ),
                               ),
                             ),
-
                             const SizedBox(height: 12),
-
                             SizedBox(
                               height: 52,
                               child: ElevatedButton(
@@ -233,9 +246,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                     ),
-
                     const SizedBox(height: 24),
-
                     Text(
                       'MesaNet 2.0',
                       style: TextStyle(

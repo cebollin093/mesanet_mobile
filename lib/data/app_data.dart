@@ -12,6 +12,7 @@ class AppData {
       id: 'carrera_1',
       nombre:
           'Técnico Superior en Análisis de Sistemas y Desarrollo de Software',
+      activa: true,
     ),
   ];
 
@@ -70,6 +71,8 @@ class AppData {
     Usuario(
       id: 'usuario_1',
       nombre: 'Alumno',
+      apellido: 'Alumno',
+      dni: '12345678',
       email: 'alumno@mesanet.com',
       carreraId: 'carrera_1',
       rol: 'alumno',
@@ -78,9 +81,12 @@ class AppData {
     Usuario(
       id: 'admin_1',
       nombre: 'Administrador',
+      apellido: 'Admin',
+      dni: '12345678',
       email: 'admin@mesanet.com',
       carreraId: 'carrera_1',
       rol: 'administrador',
+
     ),
   ];
 

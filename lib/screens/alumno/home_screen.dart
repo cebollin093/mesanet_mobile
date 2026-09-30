@@ -4,6 +4,7 @@ import '../../data/app_data.dart';
 import '../../models/inscripcion.dart';
 import '../../models/materia.dart';
 import '../../models/mesa_examen.dart';
+import '../auth/login_screen.dart';
 import 'exam_session_detail_screen.dart';
 import 'inicio_screen.dart';
 import 'mesas_screen.dart';
@@ -60,6 +61,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     enrollment.usuarioId == AppData.usuarios.first.id &&
                     enrollment.mesaExamenId == mesa.id,
               );
+
               _enrollments.add(newEnrollment);
             });
           },
@@ -76,6 +78,7 @@ class _HomeScreenState extends State<HomeScreen> {
               enrollment.usuarioId == AppData.usuarios.first.id &&
               enrollment.mesaExamenId == mesa.id,
         );
+
         _enrollments.add(result);
       });
     }
@@ -122,6 +125,20 @@ class _HomeScreenState extends State<HomeScreen> {
             fontWeight: FontWeight.w600,
           ),
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            tooltip: 'Cerrar sesión',
+            onPressed: () {
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(
+                  builder: (_) => const LoginScreen(),
+                ),
+                (route) => false,
+              );
+            },
+          ),
+        ],
       ),
       body: pages[_currentIndex],
       bottomNavigationBar: NavigationBar(
