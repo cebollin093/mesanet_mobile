@@ -21,24 +21,34 @@ class CarreraScreen extends StatelessWidget {
     final carrera = AppData.carreras.firstWhere(
       (carrera) => carrera.id == usuario.carreraId,
     );
+    final materiasCarrera = AppData.materias
+        .where((materia) => materia.carreraId == carrera.id)
+        .toList();
+    final materiasCarreraIds = materiasCarrera
+        .map((materia) => materia.id)
+        .toSet();
+    final materiasPorId = {
+      for (final materia in materiasCarrera) materia.id: materia,
+    };
     final historial = AppData.historialAcademico
         .where((registro) => registro.usuarioId == usuario.id)
         .where((registro) => registro.aprobada)
+        .where((registro) => materiasCarreraIds.contains(registro.materiaId))
         .toList();
+    final idsMateriasAprobadas = historial
+        .map((registro) => registro.materiaId)
+        .toSet();
     final materiasAprobadas = historial.map((registro) {
-      final materia = AppData.materias.firstWhere(
-        (materia) => materia.id == registro.materiaId,
-      );
+      final materia = materiasPorId[registro.materiaId]!;
       return (materia: materia, historial: registro);
     }).toList();
-    final materiasPendientes = AppData.materias.where((materia) {
-      if (materia.carreraId != carrera.id) {
-        return false;
-      }
-      return !historial.any(
-        (registro) => registro.materiaId == materia.id,
-      );
-    }).toList();
+    final materiasPendientes = materiasCarrera
+        .where((materia) => !idsMateriasAprobadas.contains(materia.id))
+        .toList();
+    final aprobadas = idsMateriasAprobadas.length;
+    final totalMaterias = materiasCarrera.length;
+    final progreso = totalMaterias == 0 ? 0.0 : aprobadas / totalMaterias;
+    final porcentaje = (progreso * 100).round();
 
     return Container(
       color: const Color(0xFFD0E2EF),
@@ -97,7 +107,7 @@ class CarreraScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Row(
+                Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
@@ -108,8 +118,8 @@ class CarreraScreen extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      '12 de 28',
-                      style: TextStyle(
+                      '$aprobadas de $totalMaterias',
+                      style: const TextStyle(
                         color: Color(0xFF123B6D),
                         fontWeight: FontWeight.bold,
                       ),
@@ -119,18 +129,18 @@ class CarreraScreen extends StatelessWidget {
                 const SizedBox(height: 12),
                 ClipRRect(
                   borderRadius: BorderRadius.circular(10),
-                  child: const LinearProgressIndicator(
-                    value: 12 / 28,
+                  child: LinearProgressIndicator(
+                    value: progreso,
                     minHeight: 10,
-                    backgroundColor: Color(0xFFDCEAF5),
-                    valueColor: AlwaysStoppedAnimation<Color>(
+                    backgroundColor: const Color(0xFFDCEAF5),
+                    valueColor: const AlwaysStoppedAnimation<Color>(
                       Color(0xFF3A8068),
                     ),
                   ),
                 ),
                 const SizedBox(height: 8),
-                const Text(
-                  '43% de la carrera completada',
+                Text(
+                  '$porcentaje% de la carrera completada',
                   style: TextStyle(
                     color: Color(0xFF64748B),
                     fontSize: 12,
