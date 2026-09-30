@@ -58,11 +58,17 @@ class _AlumnosScreenState extends State<AlumnosScreen> {
   }
 
   int _materiasAprobadas(Usuario alumno) {
+    final materiasDeCarrera = AppData.materias
+        .where((materia) => materia.carreraId == alumno.carreraId)
+        .map((materia) => materia.id)
+        .toSet();
+
     return AppData.historialAcademico
         .where(
           (historial) =>
               historial.usuarioId == alumno.id &&
-              historial.aprobada,
+              historial.aprobada &&
+              materiasDeCarrera.contains(historial.materiaId),
         )
         .map((historial) => historial.materiaId)
         .toSet()
