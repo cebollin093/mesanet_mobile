@@ -233,46 +233,6 @@ class InicioScreen extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 25),
-          const SectionTitle(
-            title: 'Accesos rápidos',
-          ),
-          const SizedBox(height: 10),
-          const Row(
-            children: [
-              Expanded(
-                child: QuickAction(
-                  icon: Icons.event,
-                  title: 'Mesas',
-                ),
-              ),
-              SizedBox(width: 12),
-              Expanded(
-                child: QuickAction(
-                  icon: Icons.school,
-                  title: 'Mi carrera',
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          const Row(
-            children: [
-              Expanded(
-                child: QuickAction(
-                  icon: Icons.history,
-                  title: 'Historial',
-                ),
-              ),
-              SizedBox(width: 12),
-              Expanded(
-                child: QuickAction(
-                  icon: Icons.calendar_month,
-                  title: 'Calendario',
-                ),
-              ),
-            ],
-          ),
           const SizedBox(height: 20),
         ],
       ),
