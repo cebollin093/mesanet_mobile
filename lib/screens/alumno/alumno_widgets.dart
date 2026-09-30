@@ -607,43 +607,6 @@ class InscriptionCard extends StatelessWidget {
                   width: double.infinity,
                   child: OutlinedButton.icon(
                     onPressed: () {
-                      ScaffoldMessenger.of(context)
-                          .showSnackBar(
-                        SnackBar(
-                          content: Text(
-                            'Detalle de la mesa de $materia',
-                          ),
-                        ),
-                      );
-                    },
-                    icon: const Icon(
-                      Icons.visibility_outlined,
-                      size: 19,
-                    ),
-                    label: const Text('Ver detalle'),
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor:
-                          const Color(0xFF123B6D),
-                      side: const BorderSide(
-                        color: Color(0xFFB8CCDC),
-                      ),
-                      padding:
-                          const EdgeInsets.symmetric(
-                        vertical: 12,
-                      ),
-                      shape:
-                          RoundedRectangleBorder(
-                        borderRadius:
-                            BorderRadius.circular(11),
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 9),
-                SizedBox(
-                  width: double.infinity,
-                  child: OutlinedButton.icon(
-                    onPressed: () {
                       showDialog(
                         context: context,
                         builder: (dialogContext) {
@@ -740,8 +703,8 @@ class InscriptionCard extends StatelessWidget {
                       'Cancelar inscripción',
                     ),
                     style: OutlinedButton.styleFrom(
-                      foregroundColor:
-                          const Color(0xFFB45353),
+                      foregroundColor: Colors.white,
+                      backgroundColor: const Color(0xFFB45353),
                       side: const BorderSide(
                         color: Color(0xFFE0B5B5),
                       ),
