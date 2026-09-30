@@ -130,31 +130,6 @@ class MesasScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 20),
-          const Row(
-            children: [
-              Expanded(
-                child: FilterButton(
-                  title: 'Todas',
-                  selected: true,
-                ),
-              ),
-              SizedBox(width: 8),
-              Expanded(
-                child: FilterButton(
-                  title: 'Próximas',
-                  selected: false,
-                ),
-              ),
-              SizedBox(width: 8),
-              Expanded(
-                child: FilterButton(
-                  title: 'Cerradas',
-                  selected: false,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
           const SectionTitle(
             title: 'Próximas mesas',
           ),
