@@ -7,6 +7,8 @@ import '../../models/mesa_examen.dart';
 import 'alumno_widgets.dart';
 
 class MesasScreen extends StatelessWidget {
+  static final RegExp _timeFormat = RegExp(r'^([0-9]{2}):([0-9]{2}) hs$');
+
   final List<Inscripcion> enrollments;
 
   final Future<void> Function({
@@ -25,6 +27,32 @@ class MesasScreen extends StatelessWidget {
     );
   }
 
+  bool _isAvailable(MesaExamen mesa, DateTime now) {
+    if (!mesa.activa) {
+      return false;
+    }
+
+    final match = _timeFormat.firstMatch(mesa.horario.trim());
+    if (match == null) {
+      return false;
+    }
+
+    final hour = int.tryParse(match.group(1)!);
+    final minute = int.tryParse(match.group(2)!);
+    if (hour == null || hour > 23 || minute == null || minute > 59) {
+      return false;
+    }
+
+    final startsAt = DateTime(
+      mesa.fecha.year,
+      mesa.fecha.month,
+      mesa.fecha.day,
+      hour,
+      minute,
+    );
+    return startsAt.isAfter(now);
+  }
+
   Materia _materiaFor(MesaExamen mesa) => AppData.materias.firstWhere(
         (materia) => materia.id == mesa.materiaId,
       );
@@ -39,6 +67,11 @@ class MesasScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final now = DateTime.now();
+    final mesasDisponibles = AppData.mesas
+        .where((mesa) => _isAvailable(mesa, now))
+        .toList();
+
     return Container(
       color: const Color(0xFFD0E2EF),
       child: ListView(
@@ -114,10 +147,10 @@ class MesasScreen extends StatelessWidget {
             title: 'Próximas mesas',
           ),
           const SizedBox(height: 10),
-          for (var index = 0; index < AppData.mesas.length; index++) ...[
+          for (var index = 0; index < mesasDisponibles.length; index++) ...[
             Builder(
               builder: (context) {
-                final mesa = AppData.mesas[index];
+                final mesa = mesasDisponibles[index];
                 final materia = _materiaFor(mesa);
                 final enrolled = _isEnrolled(mesa.id);
                 return ExamSessionCard(
@@ -133,7 +166,7 @@ class MesasScreen extends StatelessWidget {
                 );
               },
             ),
-            if (index < AppData.mesas.length - 1)
+            if (index < mesasDisponibles.length - 1)
               const SizedBox(height: 12),
           ],
           const SizedBox(height: 20),

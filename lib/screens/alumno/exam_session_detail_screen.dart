@@ -7,6 +7,8 @@ import '../../models/mesa_examen.dart';
 import '../../models/usuario.dart';
 
 class ExamSessionDetailScreen extends StatefulWidget {
+  static final RegExp _timeFormat = RegExp(r'^([0-9]{2}):([0-9]{2}) hs$');
+
   final MesaExamen mesa;
   final Materia materia;
   final Usuario usuario;
@@ -48,13 +50,46 @@ class _ExamSessionDetailScreenState
     return '${widget.mesa.fecha.day} de ${months[widget.mesa.fecha.month - 1]}';
   }
 
+  bool _isAvailable(MesaExamen mesa, DateTime now) {
+    if (!mesa.activa) {
+      return false;
+    }
+
+    final match = ExamSessionDetailScreen._timeFormat.firstMatch(
+      mesa.horario.trim(),
+    );
+    if (match == null) {
+      return false;
+    }
+
+    final hour = int.tryParse(match.group(1)!);
+    final minute = int.tryParse(match.group(2)!);
+    if (hour == null || hour > 23 || minute == null || minute > 59) {
+      return false;
+    }
+
+    final startsAt = DateTime(
+      mesa.fecha.year,
+      mesa.fecha.month,
+      mesa.fecha.day,
+      hour,
+      minute,
+    );
+    return startsAt.isAfter(now);
+  }
+
   String? _validateEnrollment() {
     final usuario = widget.usuario;
 
-    final mesaExists = AppData.mesas.any(
+    final mesaIndex = AppData.mesas.indexWhere(
       (mesa) => mesa.id == widget.mesa.id,
     );
-    if (!mesaExists) {
+    if (mesaIndex == -1) {
+      return 'La mesa de examen seleccionada ya no está disponible.';
+    }
+
+    final mesaActual = AppData.mesas[mesaIndex];
+    if (!_isAvailable(mesaActual, DateTime.now())) {
       return 'La mesa de examen seleccionada ya no está disponible.';
     }
 
