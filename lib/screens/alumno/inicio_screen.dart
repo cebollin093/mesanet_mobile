@@ -4,13 +4,18 @@ import '../../data/app_data.dart';
 import '../../models/inscripcion.dart';
 import '../../models/materia.dart';
 import '../../models/mesa_examen.dart';
+import '../../models/usuario.dart';
 import 'alumno_widgets.dart';
 
 class InicioScreen extends StatelessWidget {
+  final Usuario usuario;
   final List<Inscripcion> enrollments;
+  final VoidCallback onOpenEnrollments;
 
   const InicioScreen({super.key, 
+    required this.usuario,
     required this.enrollments,
+    required this.onOpenEnrollments,
   });
 
   MesaExamen _mesaFor(Inscripcion inscripcion) => AppData.mesas.firstWhere(
@@ -35,6 +40,20 @@ class InicioScreen extends StatelessWidget {
     final enrollment = hasEnrollment ? enrollments.first : null;
     final mesa = enrollment == null ? null : _mesaFor(enrollment);
     final materia = mesa == null ? null : _materiaFor(mesa);
+    final materiasCarrera = AppData.materias
+      .where((materia) => materia.carreraId == usuario.carreraId)
+      .toList();
+    final materiasCarreraIds = materiasCarrera
+      .map((materia) => materia.id)
+      .toSet();
+    final idsMateriasAprobadas = AppData.historialAcademico
+      .where((registro) => registro.usuarioId == usuario.id)
+      .where((registro) => registro.aprobada)
+      .where((registro) => materiasCarreraIds.contains(registro.materiaId))
+      .map((registro) => registro.materiaId)
+      .toSet();
+    final aprobadas = idsMateriasAprobadas.length;
+    final pendientes = materiasCarrera.length - aprobadas;
 
     return Container(
       color: const Color(0xFFD0E2EF),
@@ -47,12 +66,12 @@ class InicioScreen extends StatelessWidget {
               color: const Color(0xFF1E5A94),
               borderRadius: BorderRadius.circular(18),
             ),
-            child: const Column(
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '¡Hola, estudiante!',
-                  style: TextStyle(
+                  '¡Hola, ${usuario.nombre}!',
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 23,
                     fontWeight: FontWeight.bold,
@@ -74,20 +93,22 @@ class InicioScreen extends StatelessWidget {
             title: 'Próxima mesa',
           ),
           const SizedBox(height: 10),
-          Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: const Color(0xFF123B6D),
-              borderRadius: BorderRadius.circular(20),
-              boxShadow: const [
-                BoxShadow(
-                  color: Color(0x33123B6D),
-                  blurRadius: 12,
-                  offset: Offset(0, 5),
-                ),
-              ],
-            ),
-            child: hasEnrollment
+          GestureDetector(
+            onTap: hasEnrollment ? onOpenEnrollments : null,
+            child: Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: const Color(0xFF123B6D),
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Color(0x33123B6D),
+                    blurRadius: 12,
+                    offset: Offset(0, 5),
+                  ),
+                ],
+              ),
+              child: hasEnrollment
                 ? Row(
                     children: [
                       Container(
@@ -206,18 +227,19 @@ class InicioScreen extends StatelessWidget {
                       ),
                     ],
                   ),
+            ),
           ),
           const SizedBox(height: 25),
           const SectionTitle(
             title: 'Resumen académico',
           ),
           const SizedBox(height: 10),
-          const Row(
+          Row(
             children: [
               Expanded(
                 child: AcademicCard(
                   title: 'Aprobadas',
-                  value: '12',
+                  value: '$aprobadas',
                   subtitle: 'materias',
                   icon: Icons.check_circle,
                 ),
@@ -226,7 +248,7 @@ class InicioScreen extends StatelessWidget {
               Expanded(
                 child: AcademicCard(
                   title: 'Pendientes',
-                  value: '8',
+                  value: '$pendientes',
                   subtitle: 'materias',
                   icon: Icons.menu_book,
                 ),

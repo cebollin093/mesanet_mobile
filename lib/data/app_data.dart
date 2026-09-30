@@ -71,7 +71,7 @@ class AppData {
     Usuario(
       id: 'usuario_1',
       nombre: 'Alumno',
-      apellido: 'Alumno',
+      apellido: 'Alumnoap',
       dni: '12345678',
       email: 'alumno@mesanet.com',
       carreraId: 'carrera_1',

@@ -112,7 +112,13 @@ class _HomeScreenState extends State<HomeScreen> {
 
     final List<Widget> pages = [
       InicioScreen(
+        usuario: widget.usuario,
         enrollments: enrollments,
+        onOpenEnrollments: () {
+          setState(() {
+            _currentIndex = 3;
+          });
+        },
       ),
       MesasScreen(
         usuario: widget.usuario,
