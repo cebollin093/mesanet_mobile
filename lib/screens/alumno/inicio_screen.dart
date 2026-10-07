@@ -8,6 +8,8 @@ import '../../models/usuario.dart';
 import 'alumno_widgets.dart';
 
 class InicioScreen extends StatelessWidget {
+  static final RegExp _timeFormat = RegExp(r'^([0-9]{2}):([0-9]{2}) hs$');
+
   final Usuario usuario;
   final List<Inscripcion> enrollments;
   final VoidCallback onOpenEnrollments;
@@ -36,9 +38,40 @@ class InicioScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bool hasEnrollment = enrollments.isNotEmpty;
-    final enrollment = hasEnrollment ? enrollments.first : null;
-    final mesa = enrollment == null ? null : _mesaFor(enrollment);
+    final now = DateTime.now();
+    Inscripcion? enrollment;
+    MesaExamen? mesa;
+    DateTime? nearestStart;
+
+    for (final candidate in enrollments) {
+      final candidateMesa = _mesaFor(candidate);
+      final match = _timeFormat.firstMatch(candidateMesa.horario.trim());
+      if (match == null) {
+        continue;
+      }
+
+      final hour = int.tryParse(match.group(1)!);
+      final minute = int.tryParse(match.group(2)!);
+      if (hour == null || hour > 23 || minute == null || minute > 59) {
+        continue;
+      }
+
+      final startsAt = DateTime(
+        candidateMesa.fecha.year,
+        candidateMesa.fecha.month,
+        candidateMesa.fecha.day,
+        hour,
+        minute,
+      );
+      if (startsAt.isAfter(now) &&
+          (nearestStart == null || startsAt.isBefore(nearestStart))) {
+        enrollment = candidate;
+        mesa = candidateMesa;
+        nearestStart = startsAt;
+      }
+    }
+
+    final hasEnrollment = enrollment != null;
     final materia = mesa == null ? null : _materiaFor(mesa);
     final materiasCarrera = AppData.materias
       .where((materia) => materia.carreraId == usuario.carreraId)
@@ -165,7 +198,7 @@ class InicioScreen extends StatelessWidget {
                                 ),
                                 const SizedBox(width: 5),
                                 Text(
-                                  'Inscripto · ${enrollment!.condicion}',
+                                  'Inscripto · ${enrollment.condicion}',
                                   style: const TextStyle(
                                     color: Colors.white,
                                     fontSize: 12,
