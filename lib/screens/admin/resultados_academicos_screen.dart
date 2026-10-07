@@ -255,7 +255,10 @@ class _ResultadosAcademicosScreenState
                             notaController.text.replaceAll(',', '.'),
                           );
 
-                          if (nota == null || nota < 0 || nota > 10) {
+                          if (nota == null ||
+                              !nota.isFinite ||
+                              nota < 0 ||
+                              nota > 10) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
                                 content: Text(
