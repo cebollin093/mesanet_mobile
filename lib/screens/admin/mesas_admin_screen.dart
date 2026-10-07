@@ -119,7 +119,11 @@ class _MesasAdminScreenState extends State<MesasAdminScreen> {
                       onTap: () async {
                         final seleccionada = await showDatePicker(
                           context: context,
-                          initialDate: fecha,
+                          initialDate: DateUtils.dateOnly(fecha).isBefore(
+                            DateUtils.dateOnly(DateTime.now()),
+                          )
+                              ? DateTime.now()
+                              : fecha,
                           firstDate: DateTime.now(),
                           lastDate: DateTime(2035),
                         );
