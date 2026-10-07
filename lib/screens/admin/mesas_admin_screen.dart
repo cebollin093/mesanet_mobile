@@ -56,6 +56,11 @@ class _MesasAdminScreenState extends State<MesasAdminScreen> {
 
     TimeOfDay horario = _parsearHorario(mesa?.horario);
 
+    final mesaTieneInscriptos = mesa != null &&
+        AppData.inscripciones.any(
+          (inscripcion) => inscripcion.mesaExamenId == mesa.id,
+        );
+
     String? materiaId = mesa?.materiaId ??
         (AppData.materias.isNotEmpty
             ? AppData.materias.first.id
@@ -100,11 +105,13 @@ class _MesasAdminScreenState extends State<MesasAdminScreen> {
                           ),
                         );
                       }).toList(),
-                      onChanged: (value) {
-                        setDialogState(() {
-                          materiaId = value;
-                        });
-                      },
+                      onChanged: mesaTieneInscriptos
+                          ? null
+                          : (value) {
+                              setDialogState(() {
+                                materiaId = value;
+                              });
+                            },
                     ),
                     const SizedBox(height: 16),
                     InkWell(
@@ -249,7 +256,9 @@ class _MesasAdminScreenState extends State<MesasAdminScreen> {
                               if (index != -1) {
                                 AppData.mesas[index] = MesaExamen(
                                   id: mesa.id,
-                                  materiaId: materiaId!,
+                                  materiaId: mesaTieneInscriptos
+                                      ? mesa.materiaId
+                                      : materiaId!,
                                   fecha: fecha,
                                   horario: horarioTexto,
                                   activa: activa,
