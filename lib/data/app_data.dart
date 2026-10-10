@@ -70,9 +70,9 @@ class AppData {
   static final usuarios = [
     Usuario(
       id: 'usuario_1',
-      nombre: 'Alumno',
-      apellido: 'Alumnoap',
-      dni: '12345678',
+      nombre: 'David',
+      apellido: 'Fernandez',
+      dni: '32700890',
       email: 'alumno@mesanet.com',
       carreraId: 'carrera_1',
       rol: 'alumno',
